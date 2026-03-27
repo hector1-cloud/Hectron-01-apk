@@ -1,0 +1,43 @@
+name: Compilar Hectron APK
+
+# Esto hace que se compile cada vez que subas cambios, o puedes activarlo manualmente
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' 
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Instalar dependencias de Python
+        run: |
+          python -m pip install --upgrade pip
+          pip install flet
+          pip install -r requirements.txt
+
+      - name: Compilar APK con Flet
+        # Asume que tu archivo principal de la interfaz es main.py
+        run: flet build apk
+
+      - name: Subir la APK terminada
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hectron-App-Android
+          # Esta es la ruta por defecto donde Flet guarda la APK compilada
+          path: build/apk/**/*.apk 
+          
